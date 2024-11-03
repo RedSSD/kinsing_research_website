@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load admin_urls %}
+{% load static %}
+
+{% block object-tools %}
+    <div class="object-tools">
+        {% url 'admin:core_app_proxy_import_proxies' as import_url %}
+        <ul class="object-tools">
+            <li>
+                <a href="{{ import_url }}" class="addlink">
+                    Import Proxies
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

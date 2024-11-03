@@ -1,0 +1,115 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    volumes:
+      - ..:/code
+    ports:
+      - "0.0.0.0:8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    restart: always
+
+  db:
+    image: postgres:latest
+    networks:
+      default:
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}    
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+
+  redis:
+    image: redis:alpine
+    networks:
+      default:
+        aliases:
+          - redis
+    expose:
+      - "6379"
+    volumes:
+      - redisdata:/data
+    restart: always
+
+  celery_worker:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    command: celery -A alegro_parser worker -l info -Q parsing_queue -n worker1@%h --concurrency=1 --pool=prefork -E
+    env_file:
+      - .env
+    networks:
+      default:
+    volumes:
+      - ..:/code
+    depends_on:
+      - redis
+      - db
+      - web
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    restart: always
+
+  celery_export_worker:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    command: celery -A alegro_parser worker -l info -Q export_queue -n worker2@%h --concurrency=1 --pool=solo -E
+    env_file:
+      - .env
+    networks:
+      default:
+    volumes:
+      - ..:/code
+    depends_on:
+      - redis
+      - db
+      - web
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    restart: always
+
+  celery_beat:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    command: >
+      sh -c "
+      Docker/wait-for-it.sh -t 90 web:8000 &&
+      celery -A alegro_parser beat -l info"
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ..:/code
+    depends_on:
+      - redis
+      - db
+      - web
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  pgdata:
+  redisdata:

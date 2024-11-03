@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin/js/custom_headers.js' %}" data-values="{{ values|escapejs }}"></script>
+    <script>
+        // Declare global variable
+        let valuesJson = {{ values|safe }};
+    </script>
+{% endblock %}

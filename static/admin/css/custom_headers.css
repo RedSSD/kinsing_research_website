@@ -1,0 +1,44 @@
+.field-custom_headers {
+    margin-bottom: 20px;
+}
+
+/* Flex container for label, textarea, and help text */
+#widget_container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Textarea styles */
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical; /* Allow vertical resizing */
+}
+
+/* Help text styles */
+.help {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Button styles */
+.button-container {
+    margin-top: 10px;
+}
+
+.button {
+    padding: 10px 20px;
+    background-color: #007bff; /* Blue color */
+    color: #fff; /* White text */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

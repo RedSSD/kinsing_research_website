@@ -1,0 +1,17 @@
+{% load static %}
+
+<div id='widget_container'>
+    <div>
+        <label for="{{ widget.attrs.id }}">{{ widget.label }}</label>
+        <textarea name="{{ widget.name }}" cols="40" rows="10" aria-describedby="{{ widget.attrs.id }}_helptext"
+                  id="{{ widget.attrs.id }}" {{ widget.attrs }}>{{ widget.value|default_if_none:"{}" }}</textarea>
+    </div>
+    <div class="help" id="{{ widget.attrs.id }}_helptext">
+        <div>Enter custom headers as JSON, e.g., {'field_name': 'Custom Header', ...} OR use button below.</div>
+    </div>
+    <div>
+        <div class="button-container" id="button-container">
+            <button type="button" id="add-header" class="button">Add Header</button>
+        </div>
+    </div>
+</div>
