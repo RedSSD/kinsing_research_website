@@ -20,8 +20,6 @@ services:
 
   db:
     image: postgres:latest
-    networks:
-      default:
     expose:
       - "5432"
     environment:
@@ -35,10 +33,6 @@ services:
 
   redis:
     image: redis:alpine
-    networks:
-      default:
-        aliases:
-          - redis
     expose:
       - "6379"
     volumes:
@@ -52,8 +46,6 @@ services:
     command: celery -A alegro_parser worker -l info -Q parsing_queue -n worker1@%h --concurrency=1 --pool=prefork -E
     env_file:
       - .env
-    networks:
-      default:
     volumes:
       - ..:/code
     depends_on:
@@ -72,8 +64,6 @@ services:
     command: celery -A alegro_parser worker -l info -Q export_queue -n worker2@%h --concurrency=1 --pool=solo -E
     env_file:
       - .env
-    networks:
-      default:
     volumes:
       - ..:/code
     depends_on:
@@ -105,10 +95,6 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-
-networks:
-  default:
-    driver: bridge
 
 volumes:
   pgdata:
